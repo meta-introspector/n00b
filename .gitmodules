@@ -1,0 +1,3 @@
+[submodule "mcp_server"]
+	path = mcp_server
+	url = https://github.com/awslabs/mcp
