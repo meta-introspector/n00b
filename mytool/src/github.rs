@@ -8,7 +8,7 @@ use log::{info, warn, error};
 use reqwest::Client;
 use url::Url;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)] // Added Clone here
 pub struct RepoMetadata {
     pub id: i64,
     pub owner: String,
@@ -17,12 +17,18 @@ pub struct RepoMetadata {
     pub description: Option<String>,
     pub stargazers_count: i32,
     pub forks_count: i32,
+    #[serde(default)] // Added default for deserialize
     pub created_at: String, // ISO 8601 timestamp
+    #[serde(default)] // Added default for deserialize
     pub updated_at: String, // ISO 8601 timestamp
+    #[serde(default)] // Added default for deserialize
     pub pushed_at: String,  // ISO 8601 timestamp (last push)
     pub language: Option<String>,
     pub license: Option<String>, // SPDX ID or similar
+    #[serde(default)] // Added default for deserialize
     pub topics: Vec<String>,
+    #[serde(default)] // Trust score is not from GitHub API, default to 0.0
+    pub trust_score: f64, // <--- ADDED THIS LINE
     // Add more fields as needed for trust metric, e.g., open_issues_count, subscribers_count
 }
 

@@ -5,6 +5,7 @@ use rusqlite::{Connection, Result};
 use crate::github::RepoMetadata;
 use url::Url;
 use log::info;
+use serde_json; // Import serde_json here
 
 pub struct RepoIndex {
     conn: Connection,
@@ -40,8 +41,8 @@ impl RepoIndex {
         self.conn.execute(
             "INSERT OR IGNORE INTO repositories (
                 id, owner, name, html_url, description, stargazers_count, forks_count,
-                created_at, updated_at, pushed_at, language, license, topics
-            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
+                created_at, updated_at, pushed_at, language, license, topics, trust_score
+            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)",
             rusqlite::params![
                 repo.id,
                 repo.owner,
@@ -55,7 +56,8 @@ impl RepoIndex {
                 repo.pushed_at,
                 repo.language,
                 repo.license,
-                serde_json::to_string(&repo.topics).unwrap_or_default(), // Store topics as JSON string
+                serde_json::to_string(&repo.topics).unwrap_or_default(),
+                repo.trust_score, // Added trust_score here
             ],
         )?;
         Ok(())
@@ -78,6 +80,7 @@ impl RepoIndex {
                 language: row.get(10)?,
                 license: row.get(11)?,
                 topics: serde_json::from_str(&row.get::<_, String>(12)?).unwrap_or_default(),
+                trust_score: row.get(13)?, // ADDED THIS LINE
             })
         })?;
 
