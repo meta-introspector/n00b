@@ -15,3 +15,11 @@ log = "0.4"
 env_logger = "0.10"
 anyhow = "1.0" # For simplified error handling
 async-trait = "0.1" # If traits need to be async
+rocksdb = "0.20" # For caching GitHub API responses
+actix-web = "4" # For building the HTTP server
+chrono = { version = "0.4", features = ["serde"] }
+sha2 = "0.10"
+uuid = { version = "1.0", features = ["serde"] }
+
+[dev-dependencies]
+tempfile = "3" # For creating temporary directories in tests
