@@ -3,6 +3,21 @@ use super::super::state::AppState;
 use super::super::paths::GetCodePath; // This handler doesn't use GetCodePath, but keeping the import structure for now.
 use crate::code_indexer::CodeFileMetadata; // Import CodeFileMetadata directly as it's a return type
 
+/// Handles requests to list all indexed code file metadata.
+///
+/// This endpoint retrieves a list of `CodeFileMetadata` for all code files
+/// that have been indexed by the `CodeIndexer`. This provides an overview
+/// of the code assets managed by the system.
+///
+/// # Arguments
+/// * `data` - A `web::Data` extractor providing access to the shared `AppState`,
+///            including the `CodeIndexer`.
+///
+/// # Returns
+/// A `Result` which resolves to an `HttpResponse`.
+/// - On success, returns `HttpResponse::Ok()` with a JSON array of `CodeFileMetadata`.
+/// - On failure (e.g., database error, deserialization error), returns
+///   `HttpResponse::InternalServerError()` with an error message.
 pub async fn list_indexed_code_metadata_handler(
     data: web::Data<AppState>,
 ) -> Result<impl Responder, actix_web::Error> {

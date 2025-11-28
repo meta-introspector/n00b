@@ -8,6 +8,23 @@ use super::handlers::{
     get_indexed_code_handler, list_indexed_code_metadata_handler
 };
 
+/// Initializes and runs the Actix-web HTTP server for the `mytool` application.
+///
+/// This function sets up the application state with the provided GitHub client
+/// and code indexer, configures the Actix-web application with various API routes,
+/// and binds the server to the specified listen address.
+///
+/// The server exposes endpoints for interacting with the GitHub API (via a caching
+/// client) and for indexing/retrieving code files.
+///
+/// # Arguments
+/// * `github_client` - An `Arc` to a `CachedGitHubClient` instance for GitHub API access.
+/// * `code_indexer` - An `Arc` to a `CodeIndexer` instance for managing indexed code.
+/// * `listen_address` - A `String` specifying the address and port for the server to listen on (e.g., "127.0.0.1:8080").
+///
+/// # Returns
+/// An `anyhow::Result` indicating success or failure. The server runs asynchronously
+/// until an error occurs or it is explicitly shut down.
 pub async fn run_server(
     github_client: Arc<CachedGitHubClient>,
     code_indexer: Arc<CodeIndexer>,

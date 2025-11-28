@@ -6,41 +6,63 @@ use std::sync::Arc;
 use crate::cache::Cache;
 use crate::github::{GitHubClient, RepoMetadata, UserMetadata, SearchResults}; // Import SearchResults
 
+/// A `GitHubClient` implementation that provides a caching layer for GitHub API responses.
+///
+/// This client wraps a `LiveGitHubClient` (or any `GitHubClient` implementation) and
+/// stores responses in a local `Cache` (backed by RocksDB). Subsequent requests for
+/// the same data will be served from the cache, reducing API calls and improving performance.
 pub struct CachedGitHubClient {
     live_client: Arc<dyn GitHubClient + Send + Sync>, // Use Arc<dyn GitHubClient> for mockability
     cache: Cache,
 }
 
 impl CachedGitHubClient {
+    /// Creates a new `CachedGitHubClient` instance.
+    ///
+    /// # Arguments
+    /// * `live_client` - An `Arc` to an underlying `GitHubClient` implementation (e.g., `LiveGitHubClient`)
+    ///                   that will be used for actual API calls when data is not in cache.
+    /// * `cache_path` - The file system path where the cache database (RocksDB) should be stored.
+    ///
+    /// # Returns
+    /// A `Result` containing the `CachedGitHubClient` instance or an `anyhow::Error` if the
+    /// cache cannot be initialized.
     pub fn new(live_client: Arc<dyn GitHubClient + Send + Sync>, cache_path: PathBuf) -> Result<Self> {
         let cache = Cache::new(cache_path).context("Failed to initialize GitHub cache")?;
         Ok(Self { live_client, cache })
     }
 
+    /// Generates a cache key for user metadata.
     fn user_cache_key(user: &str) -> String {
         format!("user:{}", user)
     }
 
+    /// Generates a cache key for repository metadata.
     fn repo_cache_key(owner: &str, repo: &str) -> String {
         format!("repo:{}/{}", owner, repo)
     }
 
+    /// Generates a cache key for an organization's repositories list.
     fn org_repos_cache_key(org: &str) -> String {
         format!("org_repos:{}", org)
     }
 
+    /// Generates a cache key for repository search results.
     fn search_repos_cache_key(query: &str) -> String {
         format!("search_repos:{}", query)
     }
 
+    /// Generates a cache key for a user's starred repositories list.
     fn starred_repos_cache_key(user: &str) -> String {
         format!("starred_repos:{}", user)
     }
 
+    /// Generates a cache key for a user's forked repositories list.
     fn user_forked_repos_cache_key(user: &str) -> String {
         format!("user_forked_repos:{}", user)
     }
 
+    /// Generates a cache key for repository file content.
     fn get_repo_content_cache_key(owner: &str, repo: &str, path: &str) -> String {
         format!("repo_content:{}/{}/{}", owner, repo, path)
     }
@@ -48,6 +70,7 @@ impl CachedGitHubClient {
 
 #[async_trait]
 impl GitHubClient for CachedGitHubClient {
+    /// Retrieves a list of an organization's repositories, using cache first.
     async fn list_org_repos(&self, org: &str) -> Result<Vec<RepoMetadata>> {
         let key = Self::org_repos_cache_key(org);
         if let Some(repos) = self.cache.get::<Vec<RepoMetadata>>(&key)? {
@@ -58,6 +81,7 @@ impl GitHubClient for CachedGitHubClient {
         self.cache.put(&key, &repos)?;
         Ok(repos)
     }
+    /// Retrieves a user's information, using cache first.
     async fn get_user_info(&self, user: &str) -> Result<UserMetadata> {
         let key = Self::user_cache_key(user);
         if let Some(user_info) = self.cache.get::<UserMetadata>(&key)? {
@@ -69,6 +93,7 @@ impl GitHubClient for CachedGitHubClient {
         Ok(user_info)
     }
 
+    /// Retrieves repository information, using cache first.
     async fn get_repo_info(&self, owner: &str, repo: &str) -> Result<RepoMetadata> {
         let key = Self::repo_cache_key(owner, repo);
         if let Some(repo_info) = self.cache.get::<RepoMetadata>(&key)? {
@@ -80,6 +105,7 @@ impl GitHubClient for CachedGitHubClient {
         Ok(repo_info)
     }
 
+    /// Searches repositories, using cache first.
     async fn search_repositories(&self, query: &str) -> Result<SearchResults> {
         let key = Self::search_repos_cache_key(query);
         if let Some(search_results) = self.cache.get::<SearchResults>(&key)? {
@@ -91,6 +117,7 @@ impl GitHubClient for CachedGitHubClient {
         Ok(search_results)
     }
 
+    /// Lists a user's starred repositories, using cache first.
     async fn list_starred_repos(&self, user: &str) -> Result<Vec<RepoMetadata>> {
         let key = Self::starred_repos_cache_key(user);
         if let Some(repos) = self.cache.get::<Vec<RepoMetadata>>(&key)? {
@@ -102,6 +129,7 @@ impl GitHubClient for CachedGitHubClient {
         Ok(repos)
     }
 
+    /// Lists a user's forked repositories, using cache first.
     async fn list_user_forked_repos(&self, user: &str) -> Result<Vec<RepoMetadata>> {
         let key = Self::user_forked_repos_cache_key(user);
         if let Some(repos) = self.cache.get::<Vec<RepoMetadata>>(&key)? {
@@ -113,6 +141,7 @@ impl GitHubClient for CachedGitHubClient {
         Ok(repos)
     }
 
+    /// Retrieves repository file content, using cache first.
     async fn get_repo_content(&self, owner: &str, repo: &str, path: &str) -> Result<String> {
         let key = Self::get_repo_content_cache_key(owner, repo, path);
         if let Some(content) = self.cache.get::<String>(&key)? {

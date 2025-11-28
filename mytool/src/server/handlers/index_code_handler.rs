@@ -2,6 +2,25 @@ use super::super::prelude::*;
 use super::super::state::AppState;
 use super::super::paths::IndexCodePath;
 
+/// Handles requests to index a specific code file from a GitHub repository.
+///
+/// This endpoint fetches the content of a specified file from GitHub, extracts
+/// predefined keywords, and then stores both the file content and its metadata
+/// in the `CodeIndexer`. This is a core operation for the Meta Introapector feature
+/// of the MCP Tycoon Game.
+///
+/// # Arguments
+/// * `path` - A `web::Path` extractor containing the `IndexCodePath` struct, which
+///            deserializes the `{owner}`, `{repo}`, and `{path}` from the URL path.
+/// * `data` - A `web::Data` extractor providing access to the shared `AppState`,
+///            including the `CachedGitHubClient` and `CodeIndexer`.
+///
+/// # Returns
+/// A `Result` which resolves to an `HttpResponse`.
+/// - On successful fetching and indexing, returns `HttpResponse::Ok()` with the
+///   `CodeFileMetadata` of the indexed file as JSON.
+/// - On failure (e.g., file not found on GitHub, API error, indexing error), returns
+///   `HttpResponse::InternalServerError()` with an error message.
 pub async fn index_code_handler(
     path: web::Path<IndexCodePath>,
     data: web::Data<AppState>,

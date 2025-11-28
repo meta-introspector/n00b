@@ -5,23 +5,52 @@ use std::path::PathBuf;
 use chrono::{Utc, DateTime};
 use sha2::{Sha256, Digest};
 
+/// Metadata associated with an indexed code file.
+///
+/// This struct stores essential information about a code file that has been
+/// processed and stored by the `CodeIndexer`, including its repository,
+/// path, last indexing time, and extracted keywords.
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct CodeFileMetadata {
-    pub repo_full_name: String, // e.g., "jmikedupont2/my_repo"
-    pub file_path: String, // Path within the repo, e.g., "src/main.rs"
-    pub file_path_hash: String, // SHA256 hash of file_path to use as part of key
+    /// The full name of the repository (e.g., "owner/repo_name").
+    pub repo_full_name: String,
+    /// The path to the file within its repository (e.g., "src/main.rs").
+    pub file_path: String,
+    /// A SHA256 hash of the `file_path`, used as part of the key for storage.
+    pub file_path_hash: String,
+    /// The UTC timestamp when this file was last indexed.
     pub last_indexed_at: DateTime<Utc>,
-    pub keywords_found: Vec<String>, // e.g., "mcp", "actix-web"
+    /// A list of keywords extracted from the file's content, useful for search and categorization.
+    pub keywords_found: Vec<String>,
 }
 
+/// A service responsible for indexing and retrieving code file content and metadata using RocksDB.
+///
+/// The `CodeIndexer` stores code files and their associated metadata in a persistent
+/// key-value store, enabling efficient retrieval and analysis. It uses separate
+/// [Column Families](https://github.com/facebook/rocksdb/wiki/Column-Families) for metadata and content.
 pub struct CodeIndexer {
     db: DB,
 }
 
 impl CodeIndexer {
+    /// The name of the RocksDB Column Family for storing code file metadata.
     const CODE_METADATA_CF: &str = "code_metadata";
+    /// The name of the RocksDB Column Family for storing code file content.
     const CODE_CONTENT_CF: &str = "code_content";
 
+    /// Creates a new `CodeIndexer` instance, opening or creating the RocksDB database.
+    ///
+    /// This function initializes the RocksDB instance at the specified `path`, ensuring
+    /// that necessary [Column Families](https://github.com/facebook/rocksdb/wiki/Column-Families)
+    /// for metadata and content exist.
+    ///
+    /// # Arguments
+    /// * `path` - The file system path where the RocksDB database should be stored.
+    ///
+    /// # Returns
+    /// A `Result` containing the `CodeIndexer` instance or an `anyhow::Error` if the
+    /// database cannot be opened or created.
     pub fn new(path: PathBuf) -> Result<Self> {
         let mut opts = Options::default();
         opts.create_if_missing(true);
@@ -42,12 +71,39 @@ impl CodeIndexer {
         Ok(Self { db })
     }
 
+    /// Generates a SHA256 hash of a file path.
+    ///
+    /// This hash is used to create a stable and unique identifier for a file path
+    /// within the RocksDB keys, which helps in efficient lookup and prevents issues
+    /// with long or problematic file paths.
+    ///
+    /// # Arguments
+    /// * `file_path` - The path to the file (e.g., "src/main.rs").
+    ///
+    /// # Returns
+    /// A hexadecimal string representing the SHA256 hash of the input `file_path`.
     fn generate_file_path_hash(file_path: &str) -> String {
         let mut hasher = Sha256::new();
         hasher.update(file_path);
         format!("{:x}", hasher.finalize())
     }
 
+    /// Indexes a single code file, storing both its content and metadata.
+    ///
+    /// This method fetches the given code file's content from a source (implicitly
+    /// expected to be provided as `file_content`), extracts relevant keywords,
+    /// and stores both the `CodeFileMetadata` and the `file_content` in RocksDB.
+    ///
+    /// # Arguments
+    /// * `owner` - The owner of the repository.
+    /// * `repo` - The name of the repository.
+    /// * `file_path` - The path to the file within the repository.
+    /// * `file_content` - The actual content of the code file.
+    /// * `keywords` - A list of keywords to associate with the file.
+    ///
+    /// # Returns
+    /// A `Result` containing the `CodeFileMetadata` of the indexed file or an
+    /// `anyhow::Error` if storage fails.
     pub fn index_code_file(
         &self,
         owner: &str,
@@ -84,6 +140,16 @@ impl CodeIndexer {
         Ok(metadata)
     }
 
+    /// Retrieves the `CodeFileMetadata` for a specific code file.
+    ///
+    /// # Arguments
+    /// * `owner` - The owner of the repository.
+    /// * `repo` - The name of the repository.
+    /// * `file_path` - The path to the file within the repository.
+    ///
+    /// # Returns
+    /// A `Result` containing an `Option` of `CodeFileMetadata`. `None` if the
+    /// file's metadata is not found.
     pub fn get_code_file_metadata(&self, owner: &str, repo: &str, file_path: &str) -> Result<Option<CodeFileMetadata>> {
         let repo_full_name = format!("{}/{}", owner, repo);
         let file_path_hash = Self::generate_file_path_hash(file_path);
@@ -101,6 +167,16 @@ impl CodeIndexer {
         }
     }
 
+    /// Retrieves the content of a specific indexed code file.
+    ///
+    /// # Arguments
+    /// * `owner` - The owner of the repository.
+    /// * `repo` - The name of the repository.
+    /// * `file_path` - The path to the file within the repository.
+    ///
+    /// # Returns
+    /// A `Result` containing an `Option` of the file's content as a `String`.
+    /// `None` if the file's content is not found.
     pub fn get_code_file_content(&self, owner: &str, repo: &str, file_path: &str) -> Result<Option<String>> {
         let repo_full_name = format!("{}/{}", owner, repo);
         let file_path_hash = Self::generate_file_path_hash(file_path);
@@ -118,7 +194,14 @@ impl CodeIndexer {
         }
     }
 
-    // Function to list all indexed code file metadata
+    /// Lists all indexed code file metadata.
+    ///
+    /// This method iterates through the `code_metadata` Column Family and
+    /// collects all stored `CodeFileMetadata`.
+    ///
+    /// # Returns
+    /// A `Result` containing a `Vec` of all `CodeFileMetadata` instances,
+    /// or an `anyhow::Error` if deserialization or database iteration fails.
     pub fn list_indexed_code_metadata(&self) -> Result<Vec<CodeFileMetadata>> {
         let cf_metadata = self.db.cf_handle(Self::CODE_METADATA_CF)
             .context("Failed to get metadata column family handle")?;

@@ -2,6 +2,23 @@ use super::super::prelude::*;
 use super::super::state::AppState;
 use super::super::paths::RepoPath;
 
+/// Handles requests to retrieve GitHub repository information.
+///
+/// This endpoint fetches public details for a specified GitHub repository
+/// (owner and repository name). It uses the `CachedGitHubClient` from the
+/// application state for efficient data retrieval with caching.
+///
+/// # Arguments
+/// * `path` - A `web::Path` extractor containing the `RepoPath` struct, which
+///            deserializes the `{owner}` and `{repo}` from the URL path.
+/// * `data` - A `web::Data` extractor providing access to the shared `AppState`,
+///            including the `CachedGitHubClient`.
+///
+/// # Returns
+/// A `Result` which resolves to an `HttpResponse`.
+/// - On success, returns `HttpResponse::Ok()` with the `RepoMetadata` as JSON.
+/// - On failure (e.g., repository not found, API error), returns
+///   `HttpResponse::InternalServerError()` with an error message.
 pub async fn get_repo(path: web::Path<RepoPath>, data: web::Data<AppState>) -> Result<impl Responder, actix_web::Error> {
     let owner = path.owner.as_str();
     let repo_name = path.repo.as_str();

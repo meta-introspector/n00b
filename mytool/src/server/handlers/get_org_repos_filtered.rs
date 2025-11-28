@@ -4,6 +4,24 @@ use super::super::paths::OrgReposPath;
 use super::super::queries::FilterQuery;
 use crate::github::filter_repos; // filter_repos is not in prelude
 
+/// Handles requests to retrieve and filter GitHub organization repositories.
+///
+/// This endpoint fetches a list of public repositories for a specified GitHub
+/// organization. It supports an optional query parameter to filter these
+/// repositories by keywords present in their name, description, topics, or language.
+///
+/// # Arguments
+/// * `path` - A `web::Path` extractor containing the `OrgReposPath` struct, which
+///            deserializes the `{org}` from the URL path.
+/// * `query` - A `web::Query` extractor containing the `FilterQuery` struct,
+///             which deserializes the optional `query` parameter from the URL.
+/// * `data` - A `web::Data` extractor providing access to the shared `AppState`,
+///            including the `CachedGitHubClient`.
+///
+/// # Returns
+/// A `Result` which resolves to an `HttpResponse`.
+/// - On success, returns `HttpResponse::Ok()` with a JSON array of `RepoMetadata`.
+/// - On failure, returns `HttpResponse::InternalServerError()` with an error message.
 pub async fn get_org_repos_filtered(
     path: web::Path<OrgReposPath>,
     query: web::Query<FilterQuery>,

@@ -2,6 +2,25 @@ use super::super::prelude::*;
 use super::super::state::AppState;
 use super::super::paths::GetCodePath;
 
+/// Handles requests to retrieve the content of an indexed code file.
+///
+/// This endpoint fetches the content of a code file that has previously been
+/// indexed by the `CodeIndexer`. It retrieves the raw content from the
+/// persistent store.
+///
+/// # Arguments
+/// * `path` - A `web::Path` extractor containing the `GetCodePath` struct, which
+///            deserializes the `{owner}`, `{repo}`, and `{path}` from the URL path.
+/// * `data` - A `web::Data` extractor providing access to the shared `AppState`,
+///            including the `CodeIndexer`.
+///
+/// # Returns
+/// A `Result` which resolves to an `HttpResponse`.
+/// - On success, returns `HttpResponse::Ok()` with the raw file content as the response body.
+/// - If the file is not found in the index, returns `HttpResponse::NotFound()` with an
+///   appropriate error message.
+/// - On internal errors (e.g., database access issues), returns
+///   `HttpResponse::InternalServerError()` with an error message.
 pub async fn get_indexed_code_handler(
     path: web::Path<GetCodePath>,
     data: web::Data<AppState>,

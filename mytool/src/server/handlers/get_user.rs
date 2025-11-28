@@ -2,6 +2,24 @@ use super::super::prelude::*;
 use super::super::state::AppState;
 use super::super::paths::UserPath;
 
+/// Handles requests to retrieve GitHub user information.
+///
+/// This endpoint fetches public profile information for a specified GitHub user.
+/// It utilizes the `CachedGitHubClient` from the application state to efficiently
+/// retrieve user data, leveraging caching to reduce direct GitHub API calls.
+///
+/// # Arguments
+/// * `path` - A `web::Path` extractor containing the `UserPath` struct, which
+///            deserializes the `{username}` from the URL path.
+/// * `data` - A `web::Data` extractor providing access to the shared `AppState`,
+///            including the `CachedGitHubClient` and `CodeIndexer`.
+///
+/// # Returns
+/// A `Result` which resolves to an `HttpResponse`.
+/// - On success, returns `HttpResponse::Ok()` with the `UserMetadata` as JSON.
+/// - On failure (e.g., user not found, API error), returns `HttpResponse::InternalServerError()`
+///   with an error message. In a production system, different HTTP status codes
+///   (e.g., `404 Not Found`) might be returned for specific error types.
 pub async fn get_user(path: web::Path<UserPath>, data: web::Data<AppState>) -> Result<impl Responder, actix_web::Error> {
     let username = path.username.as_str();
     match data.github_client.get_user_info(username).await {
