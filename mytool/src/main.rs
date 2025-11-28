@@ -1,6 +1,7 @@
 use std::env;
 use std::sync::Arc;
 use std::path::PathBuf;
+use dotenv::dotenv; // Add this line
 
 mod github;
 mod cache;
@@ -13,6 +14,7 @@ mod syscall_executor;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    dotenv().ok(); // Add this line to load .env file
     env_logger::init();
 
     // Get GitHub Token from environment variable

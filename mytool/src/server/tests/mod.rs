@@ -11,3 +11,4 @@ pub mod test_list_user_forked_repos_success;
 pub mod test_index_and_retrieve_code_success;
 pub mod test_index_code_fetch_error;
 pub mod test_get_indexed_code_not_found;
+pub mod test_health_check;

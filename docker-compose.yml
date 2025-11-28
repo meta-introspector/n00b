@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  mytool:
+    build:
+      context: .
+      dockerfile: mytool/Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    # The CMD instruction in mytool/Dockerfile is sufficient to run the application

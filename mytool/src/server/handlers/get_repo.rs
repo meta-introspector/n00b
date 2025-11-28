@@ -1,6 +1,8 @@
 use super::super::prelude::*;
 use super::super::state::AppState;
-use super::super::paths::RepoPath;
+use super::super::paths::repo_path::RepoPath; // Explicit module import for path struct
+use actix_web::web; // Explicitly import web
+use log::error;
 
 /// Handles requests to retrieve GitHub repository information.
 ///

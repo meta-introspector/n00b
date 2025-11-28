@@ -1,7 +1,8 @@
 use super::super::prelude::*;
 use super::super::state::AppState;
-use super::super::paths::GetCodePath; // This handler doesn't use GetCodePath, but keeping the import structure for now.
 use crate::code_indexer::CodeFileMetadata; // Import CodeFileMetadata directly as it's a return type
+use actix_web::web; // Explicitly import web
+use log::error;
 
 /// Handles requests to list all indexed code file metadata.
 ///

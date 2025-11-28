@@ -1,12 +1,23 @@
 use super::prelude::*;
 use super::state::AppState;
-use super::paths::{UserPath, RepoPath, OrgReposPath, IndexCodePath, GetCodePath, UserReposPath}; // Corrected: removed FilterQuery, SearchQuery from here
-use super::queries::{FilterQuery, SearchQuery};
+use super::paths::{user_path, repo_path, org_repos_path, index_code_path, get_code_path, user_repos_path};
+use super::queries::{filter_query, search_query};
 use super::handlers::{
-    get_user, get_repo, get_org_repos_filtered, search_repositories_handler,
-    list_starred_repos_handler, list_user_forked_repos_handler, index_code_handler,
-    get_indexed_code_handler, list_indexed_code_metadata_handler
+    get_user::get_user, // Corrected to import the function
+    get_repo::get_repo, // Corrected to import the function
+    get_org_repos_filtered::get_org_repos_filtered, // Corrected to import the function
+    search_repositories_handler::search_repositories_handler, // Corrected to import the function
+    list_starred_repos_handler::list_starred_repos_handler, // Corrected to import the function
+    list_user_forked_repos_handler::list_user_forked_repos_handler, // Corrected to import the function
+    index_code_handler::index_code_handler, // Corrected to import the function
+    get_indexed_code_handler::get_indexed_code_handler, // Corrected to import the function
+    list_indexed_code_metadata_handler::list_indexed_code_metadata_handler, // Corrected to import the function
+    health_check_handler::health_check // Correct import path for health_check
 };
+
+// Only import things not in prelude or for specific disambiguation
+use log::info; // log::info is not pub use'd in prelude
+
 
 /// Initializes and runs the Actix-web HTTP server for the `mytool` application.
 ///
@@ -49,6 +60,7 @@ pub async fn run_server(
                     .route("/users/{username}/starred_repos", web::get().to(list_starred_repos_handler))
                     .route("/users/{username}/forked_repos", web::get().to(list_user_forked_repos_handler)),
             )
+            .service(web::scope("/api").route("/health", web::get().to(health_check)))
             .service(
                 web::scope("/api/mcp")
                     .route("/index_code/{owner}/{repo}/{path:.*}", web::post().to(index_code_handler))

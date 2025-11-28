@@ -1,8 +1,10 @@
 use super::super::prelude::*;
 use super::super::state::AppState;
-use super::super::paths::OrgReposPath;
-use super::super::queries::FilterQuery;
+use super::super::paths::org_repos_path::OrgReposPath; // Explicit module import for path struct
+use super::super::queries::filter_query::FilterQuery; // Explicit module import for query struct
 use crate::github::filter_repos; // filter_repos is not in prelude
+use actix_web::web; // Explicitly import web
+use log::error;
 
 /// Handles requests to retrieve and filter GitHub organization repositories.
 ///

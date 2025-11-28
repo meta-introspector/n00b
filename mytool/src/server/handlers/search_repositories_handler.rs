@@ -1,6 +1,8 @@
 use super::super::prelude::*;
 use super::super::state::AppState;
-use super::super::queries::SearchQuery;
+use super::super::queries::search_query::SearchQuery; // Explicit module import for query struct
+use actix_web::web; // Explicitly import web
+use log::error;
 
 /// Handles requests to search for GitHub repositories.
 ///

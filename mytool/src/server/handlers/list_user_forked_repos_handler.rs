@@ -1,6 +1,8 @@
 use super::super::prelude::*;
 use super::super::state::AppState;
-use super::super::paths::UserReposPath;
+use super::super::paths::user_repos_path::UserReposPath; // Explicit module import for path struct
+use actix_web::web; // Explicitly import web
+use log::error;
 
 /// Handles requests to list repositories forked by a specific GitHub user.
 ///

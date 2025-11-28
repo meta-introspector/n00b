@@ -1,6 +1,8 @@
 use super::super::prelude::*;
 use super::super::state::AppState;
-use super::super::paths::GetCodePath;
+use super::super::paths::get_code_path::GetCodePath; // Explicit module import for path struct
+use actix_web::web; // Explicitly import web
+use log::error;
 
 /// Handles requests to retrieve the content of an indexed code file.
 ///

@@ -7,11 +7,11 @@
 //! essential components for building Actix-web services, interacting with GitHub,
 //! and managing application state.
 
-use actix_web::{web, App, HttpServer, Responder, HttpResponse};
-use serde::{Deserialize, Serialize};
-use std::sync::Arc;
-use anyhow::Result;
+pub use actix_web::{web, App, HttpServer, Responder, HttpResponse};
+pub use serde::{Deserialize, Serialize};
+pub use std::sync::Arc;
+pub use anyhow::Result;
 
-use crate::github_cache::CachedGitHubClient;
-use crate::github::{GitHubClient, filter_repos, RepoMetadata};
-use crate::code_indexer::CodeIndexer; // Import CodeIndexer
+pub use crate::github_cache::CachedGitHubClient;
+pub use crate::github::{GitHubClient, filter_repos, RepoMetadata};
+pub use crate::code_indexer::CodeIndexer;

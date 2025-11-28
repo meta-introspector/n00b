@@ -1,6 +1,8 @@
 use super::super::prelude::*;
 use super::super::state::AppState;
-use super::super::paths::IndexCodePath;
+use super::super::paths::index_code_path::IndexCodePath; // Explicit module import for path struct
+use actix_web::web; // Explicitly import web
+use log::error;
 
 /// Handles requests to index a specific code file from a GitHub repository.
 ///

@@ -30,12 +30,18 @@ This guide assumes you are working within the `cargo2nix` repository structure.
     ```bash
     cd mytool
     ```
-4.  **Environment Variable**: `mytool` requires a GitHub Personal Access Token (PAT) for API access. Set it as an environment variable:
+4.  **Environment Variable**: `mytool` requires a GitHub Personal Access Token (PAT) for API access. Set it as an environment variable.
+    If you have [GitHub CLI](https://cli.github.com/) installed, you can easily retrieve your token:
+    ```bash
+    gh auth status --show-token
+    # Look for the token associated with "api.github.com"
+    ```
+    Then, set the `GITHUB_TOKEN` environment variable:
     ```bash
     # On Linux/macOS
-    export GITHUB_TOKEN="your_github_pat"
+    export GITHUB_TOKEN="your_github_pat_from_gh_auth_status"
     # On Windows (PowerShell)
-    $env:GITHUB_TOKEN="your_github_pat"
+    $env:GITHUB_TOKEN="your_github_pat_from_gh_auth_status"
     ```
     *   *Note*: Ensure your PAT has sufficient permissions (e.g., `public_repo`, `repo` for private repositories) for the GitHub API calls `mytool` will make.
 
