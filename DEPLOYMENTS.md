@@ -12,6 +12,7 @@ All deployments serve the same 71-shard Gandalf WASM app (5.6MB split into ~78KB
 | HuggingFace Spaces | https://introspector-solfunmeme-dioxus.hf.space/ | Always free (Docker SDK) |
 | Oracle Cloud | https://objectstorage.us-ashburn-1.oraclecloud.com/n/id1iqr236pdp/b/solfunmeme-dioxus/o/index.html | 10GB always free |
 | Self-hosted | https://solana.solfunmeme.com/dioxus/ | Own server, nginx proxy |
+| Supabase | https://opczaaftecjpremkwwxi.supabase.co | Free tier: 500MB DB, 1GB storage, 2GB bandwidth |
 
 ## 🎯 TODO: Connect via Dashboard
 
