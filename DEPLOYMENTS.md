@@ -2,7 +2,7 @@
 
 All deployments serve the same 71-shard Gandalf WASM app (5.6MB split into ~78KB shards).
 
-## ✅ Active Deployments
+## ✅ Active Deployments (6)
 
 | Platform | URL | Free Tier |
 |----------|-----|-----------|
@@ -10,47 +10,50 @@ All deployments serve the same 71-shard Gandalf WASM app (5.6MB split into ~78KB
 | Cloudflare Pages | https://solfunmeme-dioxus.pages.dev | Always free, global CDN |
 | Vercel | https://solfunmeme-dioxus.vercel.app | Always free, edge network |
 | HuggingFace Spaces | https://introspector-solfunmeme-dioxus.hf.space/ | Always free (Docker SDK) |
+| Oracle Cloud | https://objectstorage.us-ashburn-1.oraclecloud.com/n/id1iqr236pdp/b/solfunmeme-dioxus/o/index.html | 10GB always free |
 | Self-hosted | https://solana.solfunmeme.com/dioxus/ | Own server, nginx proxy |
 
-## 🎯 TODO: Additional Free Tier Platforms
+## 🎯 TODO: Connect via Dashboard
 
-From [free-resources.md](free-resources.md):
+These platforms support GitHub integration — connect `meta-introspector/solfunmeme-dioxus`, set publish directory to `docs/`, leave build command empty:
 
-| Platform | Free Tier | Status |
-|----------|-----------|--------|
-| Render | Always free static sites, 100GB bandwidth | TODO |
-| Netlify | Always free static sites | TODO |
-| Zeabur | Always free static sites, 10GB outbound | TODO |
-| AWS S3 + CloudFront | 5GB S3 + 50GB CloudFront (12 months) | TODO |
-| Google Cloud Storage | 5GB-months regional (always free) | TODO |
-| Azure Static Web Apps | Always free, 100GB bandwidth | TODO |
-| Oracle Cloud Object Storage | 10GB always free | TODO |
+| Platform | Setup URL | Free Tier |
+|----------|-----------|-----------|
+| Render | https://dashboard.render.com/select-repo → Static Site → `docs/` | Always free, 100GB/mo |
+| Netlify | https://app.netlify.com/start → GitHub → `docs/` | Always free, 100GB/mo |
+| Zeabur | https://zeabur.com → GitHub → `docs/` | Always free, 10GB/mo |
+| Azure Static Web Apps | https://portal.azure.com → Static Web Apps → GitHub → `docs/` | Always free, 100GB/mo |
 
-## Deploy to a New Platform
-
-The `docs/` directory in `solfunmeme-dioxus` contains the complete static build:
-- 71 WASM shards + manifest.json
-- shard-loader.js (parallel fetch, progress bar)
-- index.html with importmap for WASM env module
-- 404.html for SPA routing
-
-Any static hosting platform works. Just point it at `docs/`.
-
-## Build from Source
+## 🔧 CLI Deploy Commands
 
 ```bash
-# Clone and build
-git clone https://github.com/meta-introspector/solfunmeme-dioxus
-cd solfunmeme-dioxus
-./build.sh  # requires nix
+# Build shards (requires nix)
+/mnt/data1/meta-introspector/submodules/solfunmeme-dioxus/build.sh
 
-# Or use pre-built docs/
-ls docs/
+# Cloudflare Pages
+CLOUDFLARE_API_TOKEN=$(cat ~/.cloudflare-pages) \
+CLOUDFLARE_ACCOUNT_ID=0ceffbadd0a04623896f5317a1e40d94 \
+npx wrangler pages deploy docs/ --project-name=solfunmeme-dioxus
+
+# Oracle OCI (Python)
+python3 -c "
+import oci, os, mimetypes
+config = oci.config.from_file('~/.solfunmeme-keys/oci_config')
+c = oci.object_storage.ObjectStorageClient(config)
+ns = c.get_namespace().data
+for root, _, files in os.walk('docs'):
+    for f in files:
+        p = os.path.join(root, f)
+        ct = 'application/wasm' if f.endswith('.wasm') else mimetypes.guess_type(p)[0] or 'application/octet-stream'
+        c.put_object(ns, 'solfunmeme-dioxus', os.path.relpath(p, 'docs'), open(p, 'rb'), content_type=ct)
+"
+
+# Vercel + GitHub Pages — auto-deploy on git push to main
+git push origin main
 ```
 
 ## Submodules
 
-This repo includes source references:
 - `source/solfunmeme-dioxus` — WASM frontend (Dioxus 0.7.3, 12 plugins)
 - `source/erdfa-publish` — shared Rust lib + CLI + service
 - `source/solfunmeme-introspector` — Lean4 verified governance proofs
