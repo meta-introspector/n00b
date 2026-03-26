@@ -1,3 +1,18 @@
 [submodule "mcp_server"]
 	path = mcp_server
 	url = https://github.com/awslabs/mcp
+[submodule "source/solfunmeme-dioxus"]
+	path = source/solfunmeme-dioxus
+	url = https://github.com/meta-introspector/solfunmeme-dioxus.git
+[submodule "source/erdfa-publish"]
+	path = source/erdfa-publish
+	url = https://github.com/meta-introspector/erdfa-publish.git
+[submodule "source/solfunmeme-introspector"]
+	path = source/solfunmeme-introspector
+	url = https://github.com/jmikedupont2/solfunmeme-introspector.git
+[submodule "source/pick-up-nix"]
+	path = source/pick-up-nix
+	url = https://github.com/meta-introspector/pick-up-nix.git
+[submodule "source/wrangler-action"]
+	path = source/wrangler-action
+	url = https://github.com/cloudflare/wrangler-action.git

@@ -6,6 +6,10 @@ Welcome! This repository helps **absolute beginners** and aspiring founders star
 
 ## 📚 Documentation Overview
 
+### 0. [Deployment Guide — Free Tier Hosting](DEPLOYMENTS.md)
+How to deploy the SOLFUNMEME DAO WASM app to 10+ free hosting platforms. Includes active deployments and TODO list.
+
+
 All major guides and resources are linked below for easy access:
 
 ### 1. [Complete Beginner's Guide to Building with AI and Free Cloud Services](tutorial.md)
