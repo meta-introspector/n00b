@@ -49,3 +49,27 @@ If you found this useful, share your progress or ask for feedback in online comm
 
 **Happy coding!**
 
+
+---
+
+## 🌐 SOLFUNMEME DAO — Live Deployments
+
+This project is part of the SOLFUNMEME DAO ecosystem. The WASM frontend is deployed across 5 platforms using a 71-shard Gandalf loader:
+
+| Platform | URL |
+|----------|-----|
+| GitHub Pages | https://meta-introspector.github.io/solfunmeme-dioxus/ |
+| Cloudflare Pages | https://solfunmeme-dioxus.pages.dev |
+| Vercel | https://solfunmeme-dioxus.vercel.app |
+| HuggingFace | https://introspector-solfunmeme-dioxus.hf.space/ |
+| Self-hosted | https://solana.solfunmeme.com/dioxus/ |
+
+### Get Started with the DAO
+
+1. Get SOLFUNMEME tokens: `BwUTq7fS6sfUmHDwAiCQZ3asSiPEapW5zDrsbwtapump`
+2. Visit any deployment above
+3. Your tier is determined by token holdings (Fibonacci boundaries, Lean4-verified)
+4. Vote on daily ZK rollup bills at `/dao`
+
+**Source**: https://github.com/meta-introspector/solfunmeme-dioxus
+**Onboarding**: https://huggingface.co/datasets/introspector/solfunmeme (see ONBOARDING.md)
